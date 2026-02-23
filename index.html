@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coding Game - Code Sprint</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header>
+        <h1>🏁 Code Sprint</h1>
+        <p>Viết hàm JavaScript để vượt qua các thử thách và mở khóa cấp độ tiếp theo.</p>
+      </header>
+
+      <section class="panel info-panel">
+        <div>
+          <span class="label">Cấp độ</span>
+          <strong id="level-name">-</strong>
+        </div>
+        <div>
+          <span class="label">Điểm</span>
+          <strong id="score">0</strong>
+        </div>
+        <div>
+          <span class="label">Tiến độ</span>
+          <strong id="progress">0 / 0</strong>
+        </div>
+      </section>
+
+      <section class="panel challenge-panel">
+        <h2>Mô tả bài toán</h2>
+        <p id="challenge-description"></p>
+        <div class="signature-wrap">
+          <span class="label">Hàm cần hoàn thành</span>
+          <code id="function-signature"></code>
+        </div>
+      </section>
+
+      <section class="panel editor-panel">
+        <label for="code-editor">Code của bạn</label>
+        <textarea id="code-editor" spellcheck="false"></textarea>
+        <button id="run-btn">Chạy kiểm thử</button>
+      </section>
+
+      <section class="panel output-panel">
+        <h2>Kết quả</h2>
+        <ul id="test-results"></ul>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
