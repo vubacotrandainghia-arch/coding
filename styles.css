@@ -1,0 +1,96 @@
+:root {
+  --bg: #0f1628;
+  --panel: #1a2138;
+  --accent: #2bd8ff;
+  --text: #e7f0ff;
+  --danger: #ff5c7c;
+  --ok: #67ff87;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Inter, Segoe UI, system-ui, sans-serif;
+  background: radial-gradient(circle at top, #1f2f56, var(--bg));
+  color: var(--text);
+}
+.hidden { display: none !important; }
+.panel {
+  background: rgba(18, 25, 44, 0.95);
+  border: 1px solid #2f3d67;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 0 0 1px #10172b inset;
+}
+.auth-panel {
+  max-width: 440px;
+  margin: 8vh auto;
+}
+.auth-form, .tabs, .row { display: flex; gap: 8px; }
+.auth-form { flex-direction: column; margin-top: 10px; }
+input, select, button {
+  border: 1px solid #385086;
+  background: #0f1b33;
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px;
+}
+button {
+  cursor: pointer;
+  background: linear-gradient(135deg, #18489d, #0b71a0);
+  font-weight: 600;
+}
+button:hover { filter: brightness(1.1); }
+.tabs button.active { border-color: var(--accent); color: var(--accent); }
+.msg { min-height: 20px; color: var(--accent); }
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: #0b1428;
+  border-bottom: 1px solid #253b6f;
+}
+.status-wrap {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 14px;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 300px 1fr 320px;
+  gap: 12px;
+  padding: 12px;
+}
+.sidebar { display: flex; flex-direction: column; gap: 10px; }
+.center { display: flex; flex-direction: column; gap: 10px; }
+#battlefield {
+  width: 100%;
+  max-width: 900px;
+  border: 2px solid #304b83;
+  border-radius: 12px;
+  background: #15274e;
+}
+.hud {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  background: #0d1934;
+  padding: 8px;
+  border-radius: 8px;
+}
+.list { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-direction: column; gap: 6px; }
+.list li, #shop-items .item {
+  border: 1px solid #324c85;
+  border-radius: 8px;
+  padding: 7px;
+  background: #0f1a34;
+}
+#offer-box { min-height: 80px; }
+.good { color: var(--ok); }
+.bad { color: var(--danger); }
+@media (max-width: 1200px) {
+  .layout { grid-template-columns: 1fr; }
+  #battlefield { max-width: 100%; }
+}
