@@ -1,0 +1,11 @@
+{
+  "name": "battle-wars",
+  "version": "1.0.1",
+  "private": true,
+  "description": "Battle wars preview app",
+  "scripts": {
+    "preview": "node server.js",
+    "start": "node server.js",
+    "check": "node --check app.js"
+  }
+}

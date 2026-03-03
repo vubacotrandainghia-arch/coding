@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Battle wars v1.0</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="auth-screen" class="panel auth-panel">
+      <h1>⚔️ Battle wars v1.0</h1>
+      <p>Tạo tài khoản để bắt đầu cuộc chiến.</p>
+      <div class="tabs">
+        <button id="tab-login" class="active">Đăng nhập</button>
+        <button id="tab-register">Đăng ký</button>
+      </div>
+      <form id="login-form" class="auth-form">
+        <input id="login-user" placeholder="Tên tài khoản" required />
+        <input id="login-pass" type="password" placeholder="Mật khẩu" required />
+        <button type="submit">Vào game</button>
+      </form>
+      <form id="register-form" class="auth-form hidden">
+        <input id="register-user" placeholder="Tên tài khoản" required />
+        <input id="register-pass" type="password" placeholder="Mật khẩu" required />
+        <button type="submit">Tạo tài khoản</button>
+      </form>
+      <p id="auth-msg" class="msg"></p>
+      <small>Mặc định có admin: <b>admin / battlewars</b></small>
+    </div>
+
+    <div id="game-screen" class="hidden">
+      <header class="topbar">
+        <h2>Battle wars</h2>
+        <div class="status-wrap">
+          <span id="user-info"></span>
+          <span id="currency-info"></span>
+          <span id="match-info"></span>
+        </div>
+        <button id="logout-btn">Đăng xuất</button>
+      </header>
+
+      <main class="layout">
+        <aside class="sidebar left">
+          <section class="panel">
+            <h3>🎛 GameManager</h3>
+            <label>Map
+              <select id="map-select">
+                <option value="forest">Rừng</option>
+                <option value="desert">Sa mạc</option>
+                <option value="urban">Đô thị</option>
+              </select>
+            </label>
+            <label>Độ khó
+              <select id="difficulty-select">
+                <option value="normal">Normal</option>
+                <option value="hard">Hard</option>
+                <option value="chaos">Chaos</option>
+              </select>
+            </label>
+            <button id="start-match">Bắt đầu trận</button>
+            <button id="invite-btn">Mời người chơi ngoài</button>
+            <button id="hospital-btn">Đến bệnh viện (-20 xu, +60 HP)</button>
+          </section>
+
+          <section class="panel">
+            <h3>🤝 Bạn bè</h3>
+            <div class="row">
+              <input id="friend-name" placeholder="Tên bạn" />
+              <button id="add-friend-btn">Kết bạn</button>
+            </div>
+            <ul id="friend-list" class="list"></ul>
+          </section>
+
+          <section class="panel">
+            <h3>🚗 Phương tiện</h3>
+            <div class="row">
+              <select id="vehicle-select"></select>
+              <button id="use-vehicle">Dùng</button>
+            </div>
+            <p id="vehicle-info"></p>
+          </section>
+        </aside>
+
+        <section class="center">
+          <canvas id="battlefield" width="900" height="520"></canvas>
+          <div class="hud">
+            <span id="hp-bar"></span>
+            <span id="ammo-info"></span>
+            <span id="scope-state"></span>
+            <span id="event-feed"></span>
+          </div>
+        </section>
+
+        <aside class="sidebar right">
+          <section class="panel">
+            <h3>🛒 Shop & tiền tệ</h3>
+            <div class="row">
+              <select id="currency-select">
+                <option value="VND">VND</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="JPY">JPY</option>
+              </select>
+              <button id="topup-btn">Nạp</button>
+            </div>
+            <div class="row">
+              <select id="payment-select">
+                <option>Thẻ</option>
+                <option>Ví điện tử</option>
+                <option>Crypto</option>
+                <option>Banking</option>
+              </select>
+              <input id="topup-amount" type="number" min="1" value="100" />
+            </div>
+            <div id="shop-items" class="list"></div>
+          </section>
+
+          <section class="panel">
+            <h3>🎁 Special Offer</h3>
+            <div id="offer-box"></div>
+            <button id="buy-offer">Mua gói ưu đãi</button>
+          </section>
+
+          <section class="panel">
+            <h3>🎒 Trang bị</h3>
+            <ul id="inventory" class="list"></ul>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
