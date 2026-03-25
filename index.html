@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pháo Hoa Canvas - Nhiều Hiệu Ứng</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        overflow: hidden;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: radial-gradient(circle at top, #121529, #04050a 55%, #000 100%);
+      }
+
+      #fireworks {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      .panel {
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        width: min(360px, calc(100vw - 32px));
+        background: rgba(8, 12, 22, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 14px;
+        padding: 14px;
+        backdrop-filter: blur(10px);
+        z-index: 2;
+      }
+
+      .panel h1 {
+        margin: 0 0 10px;
+        font-size: 17px;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .row label {
+        font-size: 13px;
+        opacity: 0.95;
+      }
+
+      .row input,
+      .row select,
+      button {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.17);
+        border-radius: 8px;
+        padding: 6px 8px;
+      }
+
+      .actions {
+        margin-top: 10px;
+        display: flex;
+        gap: 8px;
+      }
+
+      button {
+        cursor: pointer;
+        flex: 1;
+      }
+
+      .tip {
+        margin-top: 8px;
+        font-size: 12px;
+        opacity: 0.78;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="fireworks"></canvas>
+
+    <section class="panel">
+      <h1>🎆 Trình điều khiển pháo hoa</h1>
+
+      <div class="row">
+        <label for="shapeSelect">Loại pháo hoa</label>
+        <select id="shapeSelect">
+          <option value="normal">Thông thường</option>
+          <option value="heart">Trái tim</option>
+          <option value="star">Ngôi sao</option>
+          <option value="ring">Vòng tròn</option>
+          <option value="mixed">Trộn ngẫu nhiên</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label for="burstCount">Số hạt mỗi vụ nổ</label>
+        <input id="burstCount" type="number" min="20" max="360" value="120" />
+      </div>
+
+      <div class="row">
+        <label for="gravity">Trọng lực</label>
+        <input id="gravity" type="range" min="0.01" max="0.4" step="0.01" value="0.08" />
+      </div>
+
+      <div class="row">
+        <label for="speed">Tốc độ nổ</label>
+        <input id="speed" type="range" min="1" max="9" step="0.2" value="4.4" />
+      </div>
+
+      <div class="row">
+        <label for="autoMode">Tự động bắn</label>
+        <input id="autoMode" type="checkbox" checked />
+      </div>
+
+      <div class="actions">
+        <button id="shootNow">Bắn ngay</button>
+        <button id="clearBtn">Xoá nền</button>
+      </div>
+
+      <p class="tip">Mẹo: Click chuột bất kỳ để bắn pháo hoa tại vị trí click.</p>
+    </section>
+
+    <script>
+      const canvas = document.getElementById('fireworks');
+      const ctx = canvas.getContext('2d');
+
+      const controls = {
+        shape: document.getElementById('shapeSelect'),
+        burstCount: document.getElementById('burstCount'),
+        gravity: document.getElementById('gravity'),
+        speed: document.getElementById('speed'),
+        autoMode: document.getElementById('autoMode'),
+        shootNow: document.getElementById('shootNow'),
+        clearBtn: document.getElementById('clearBtn'),
+      };
+
+      let width = 0;
+      let height = 0;
+      const particles = [];
+      const rockets = [];
+
+      function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      function rand(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      function launch(x = rand(width * 0.15, width * 0.85), y = rand(height * 0.16, height * 0.55)) {
+        rockets.push({
+          x,
+          y: height + 20,
+          targetY: y,
+          vx: rand(-0.8, 0.8),
+          vy: rand(-10.5, -8.3),
+          color: `hsl(${Math.floor(rand(0, 360))}, 100%, 66%)`,
+        });
+      }
+
+      function vectorFromShape(type, angle, t) {
+        if (type === 'ring') {
+          return { x: Math.cos(angle), y: Math.sin(angle) };
+        }
+
+        if (type === 'heart') {
+          const a = t * Math.PI * 2;
+          // Đường cong trái tim chuẩn hóa
+          const hx = 16 * Math.pow(Math.sin(a), 3) / 17;
+          const hy = -(13 * Math.cos(a) - 5 * Math.cos(2 * a) - 2 * Math.cos(3 * a) - Math.cos(4 * a)) / 17;
+          return { x: hx, y: hy };
+        }
+
+        if (type === 'star') {
+          const arm = (Math.floor(t * 10) % 2 === 0) ? 1 : 0.42;
+          return { x: Math.cos(angle) * arm, y: Math.sin(angle) * arm };
+        }
+
+        return {
+          x: Math.cos(angle) * rand(0.75, 1.1),
+          y: Math.sin(angle) * rand(0.75, 1.1),
+        };
+      }
+
+      function explode(x, y) {
+        const baseCount = Number(controls.burstCount.value) || 120;
+        const shapeChoice = controls.shape.value;
+        const speed = Number(controls.speed.value) || 4.4;
+        const hue = Math.floor(rand(0, 360));
+        const shape = shapeChoice === 'mixed'
+          ? ['normal', 'heart', 'star', 'ring'][Math.floor(rand(0, 4))]
+          : shapeChoice;
+
+        for (let i = 0; i < baseCount; i++) {
+          const t = i / baseCount;
+          const angle = t * Math.PI * 2;
+          const dir = vectorFromShape(shape, angle, t);
+          const power = rand(speed * 0.6, speed * 1.4);
+
+          particles.push({
+            x,
+            y,
+            vx: dir.x * power,
+            vy: dir.y * power,
+            life: rand(50, 95),
+            size: rand(1.2, 2.8),
+            drag: rand(0.972, 0.986),
+            glow: rand(8, 16),
+            color: `hsl(${(hue + rand(-28, 28) + 360) % 360},100%,${rand(56, 74)}%)`,
+          });
+        }
+      }
+
+      function updateRockets() {
+        for (let i = rockets.length - 1; i >= 0; i--) {
+          const r = rockets[i];
+          r.x += r.vx;
+          r.y += r.vy;
+          r.vy += 0.05;
+
+          ctx.beginPath();
+          ctx.fillStyle = r.color;
+          ctx.arc(r.x, r.y, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+
+          if (r.y <= r.targetY || r.vy > -1.4) {
+            explode(r.x, r.y);
+            rockets.splice(i, 1);
+          }
+        }
+      }
+
+      function updateParticles() {
+        const gravity = Number(controls.gravity.value) || 0.08;
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.vx *= p.drag;
+          p.vy = p.vy * p.drag + gravity;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.life -= 1;
+
+          const alpha = Math.max(0, p.life / 95);
+          ctx.beginPath();
+          ctx.fillStyle = p.color.replace('hsl', 'hsla').replace('%)', `%, ${alpha})`);
+          ctx.shadowBlur = p.glow;
+          ctx.shadowColor = p.color;
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+
+          if (p.life <= 0) {
+            particles.splice(i, 1);
+          }
+        }
+      }
+
+      function frame() {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.globalCompositeOperation = 'lighter';
+        updateRockets();
+        updateParticles();
+
+        requestAnimationFrame(frame);
+      }
+
+      let autoTimer = setInterval(() => {
+        if (!controls.autoMode.checked) return;
+        launch();
+      }, 460);
+
+      controls.autoMode.addEventListener('change', () => {
+        if (!autoTimer) {
+          autoTimer = setInterval(() => {
+            if (controls.autoMode.checked) launch();
+          }, 460);
+        }
+      });
+
+      controls.shootNow.addEventListener('click', () => launch());
+      controls.clearBtn.addEventListener('click', () => {
+        rockets.length = 0;
+        particles.length = 0;
+        ctx.clearRect(0, 0, width, height);
+      });
+
+      window.addEventListener('pointerdown', (event) => {
+        const y = Math.min(event.clientY, height * 0.8);
+        launch(event.clientX, y);
+      });
+
+      frame();
+    </script>
+  </body>
+</html>
